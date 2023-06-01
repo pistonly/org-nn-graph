@@ -1,0 +1,92 @@
+* start websocket server
+#+BEGIN_SRC jupyter-python :session py :async yes :exports both :eval never-export :display text/plain :results raw
+  import subprocess
+  import time
+  p = subprocess.Popen(['python', 'ws_server.py'], stdout=subprocess.PIPE,
+                       stderr=subprocess.STDOUT, encoding='utf8', cwd="/home/liuyang/Documents/myEmacs/org_nn_graph/")
+  time.sleep(0.5)
+  # start chrome
+  subprocess.run(['google-chrome', "index.html"], cwd="/home/liuyang/Documents/myEmacs/org_nn_graph/gojs_flowchart", shell=True)
+#+END_SRC
+
+#+RESULTS:
+:RESULTS:
+: Opening in existing browser session.
+: CompletedProcess(args=['google-chrome', 'index.html'], returncode=0)
+:END:
+
+* send to graph
+
+#+BEGIN_SRC jupyter-python :session py :async yes :exports both :eval never-export :display text/plain :results raw
+  import json
+  import numpy as np
+  from websocket import create_connection
+
+  def send_to_web(message, url="ws://127.0.0.1:9999"):
+      ws = create_connection(url)
+      ws.send(message)
+      ws.close()
+
+  def generate_json(types, widths, heights, keys, connections, ws=1, hs=1):
+      nodeDataArray = []
+      current_loc = np.array([0, 0])
+      for t, w, h, k in zip(types, widths, heights, keys):
+          nodeDataArray.append({"key": k, "category": t, "text": k, "height": h * hs, "width": w * ws,
+                                "loc": f"{current_loc[0]} {current_loc[1]}"})
+          current_loc -= [0, h * hs + 30]
+      linkDataArray = []
+
+      def add_one_link(current_i, con_i):
+          con_i = current_i - 1 if con_i == -1 else con_i
+          fromm = keys[con_i]
+          to = keys[current_i]
+          linkDataArray.append({"from": fromm, "to": to,  "fromPort":"T", "toPort":"B"})
+
+      for i, con in enumerate(connections):
+          if con is None:
+              continue
+          con = con if isinstance(con, list) else [con]
+          for con_i in con:
+              add_one_link(i, con_i)
+      json_data = {"class": "go.GraphLinksModel",
+                   "linkFromPortIdProperty": "fromPort",
+                   "linkToPortIdProperty": "toPort"}
+      json_data['nodeDataArray'] = nodeDataArray
+      json_data['linkDataArray'] = linkDataArray
+      json_data = json.dumps(json_data, indent=4)
+      return json_data
+
+  types = ['conv', 'conv', 'conv', 'conv', 'conv', 'elan', 'srd', 'elan', 'srd', 'elan', 'srd', 'elan']
+  img_size = [640, 640, 320, 320, 160, 160, 80, 80, 40, 40, 20, 20]
+  channels = [3, 32, 64, 64, 128, 256, 256, 512, 512, 1024, 1024, 1024]
+  key = ['conv0', 'conv1', 'conv2', 'conv3', 'conv4', 'elan1', 'srd1', 'elan2', 'srd2', 'elan3', 'srd3', 'elan4']
+  connections = [-1] * len(key)
+  connections[0] = None
+
+  graph_json = generate_json(types, img_size, channels, key, connections)
+  send_to_web(graph_json)
+
+  # # elan 
+  # types_elan = ['input', 'conv', 'conv',  'conv', 'conv', 'conv', 'conv', 'conc', 'conv']
+  # img_size = [160, 160, 160, 160, 160, 160, 160, 160, 160]
+  # channels = [128, 54, 64, 64, 64, 64, 64, 256, 256]
+  # key = ['input-e', 'conv-e1', 'conv-e2', 'conv-e3', 'conv-e4', 'conv-e5', 'conc-e1', 'conv-e6']
+  # connections = [None, -1, -1, -1, -1, -1, 0, [-1, 1, 3, -2], -1]
+
+  # # scale-resolution-down
+  # types_sd = ['input', 'conv', 'conv', 'mp', 'conv', 'conc']
+  # img_size = [160, 160, 160, 80, 80, 80]
+  # channels = [256, 256, 128, 256, 128, 256]
+  # key = ['input-srd', 'conv-srd1', 'conv-srd2', 'mp-srd1', 'conv-srd3', 'conc-srd1']
+  # connections = [None, -1, -1, 0, -1, [-1, 2]]
+
+#+END_SRC
+
+#+RESULTS:
+
+#+BEGIN_SRC jupyter-python :session py :async yes :exports both :eval never-export :display text/plain :results raw
+p.kill()
+#+END_SRC
+
+#+RESULTS:
+

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - gojs flowchart</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div id="sample">
+  <div style="width:100%; white-space:nowrap;">
+    <span style="display: inline-block; vertical-align: top; width:100px">
+      <div id="myPaletteDiv" style="border: solid 1px black; height: 720px"></div>
+    </span>
+
+    <span style="display: inline-block; vertical-align: top; width:80%">
+      <div id="myDiagramDiv" style="border: solid 1px black; height: 720px"></div>
+    </span>
+  </div>
+  <p>
+  The FlowChart sample demonstrates several key features of GoJS,
+  namely <a href="../intro/palette.html">Palette</a>s,
+  <a href="../intro/links.html">Linkable nodes</a>, Drag/Drop behavior,
+  <a href="../intro/textBlocks.html">Text Editing</a>, and the use of
+  <a href="../intro/templateMaps.html">Node Template Maps</a> in Diagrams.
+  </p>
+  <p>
+  Mouse-over a Node to view its ports.
+  Drag from these ports to create new Links.
+  Selecting Links allows you to re-shape and re-link them.
+  Selecting a Node and then clicking its TextBlock will allow
+  you to edit text (except on the Start and End Nodes).
+  </p>
+  <button id="SaveButton" onclick="save()">Save</button>
+  <button onclick="load()">Load</button>
+  Diagram Model saved in JSON format:
+  <textarea id="mySavedModel" style="width:100%;height:300px">
+  </textarea>
+  <p>Click the button below to render the current GoJS Diagram into SVG at one-half scale.
+     The SVG is not interactive like the GoJS diagram, but can be used for printing or display.
+     For more information, see the page on <a href="../intro/makingSVG.html">making SVG</a>.</p>
+  <button onclick="makeSVG()">Render as SVG</button>
+  <div id="SVGArea"></div>
+</div>
+<!-- partial -->
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/gojs/1.6.23/go.js'></script><script  src="./script.js"></script>
+
+</body>
+</html>
