@@ -1,0 +1,11 @@
+Emacs org to gojs.
+
+*** orgbabel-python-websocket
+**** steps
+1. start websocket server
+2. open html file (connect to ws as a client)
+3. run python code (send to ws, then to html client)
+*** TODO org-python-websocket
+:LOGBOOK:
+- State "TODO"       from              [2023-06-01 四 19:17]
+:END:
